@@ -1,0 +1,19 @@
+{
+  "name": "dueinator",
+  "version": "0.1.0",
+  "description": "An alternative desktop client for @dueapp",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron main.js"
+  },
+  "author": "Richard Wang",
+  "license": "MIT",
+  "homepage": "https://github.com/rzhw/Dueinator",
+  "dependencies": {
+    "bplist-parser": "~0.1.1",
+    "simple-plist": "~0.0.4"
+  },
+  "devDependencies": {
+    "electron-prebuilt": "^0.36.0"
+  }
+}

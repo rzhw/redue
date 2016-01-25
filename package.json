@@ -4,7 +4,10 @@
   "description": "An alternative desktop client for @dueapp",
   "main": "main.js",
   "scripts": {
-    "start": "electron main.js"
+    "tsc": "tsc",
+    "tsc:w": "tsc -w",
+    "electron": "electron main.js",
+    "start": "concurrent \"npm run tsc:w\" \"npm run electron\""
   },
   "author": "Richard Wang",
   "license": "MIT",
@@ -21,6 +24,8 @@
     "zone.js": "0.5.10"
   },
   "devDependencies": {
-    "electron-prebuilt": "^0.36.0"
+    "concurrently": "^1.0.0",
+    "electron-prebuilt": "^0.36.0",
+    "typescript": "^1.7.3"
   }
 }

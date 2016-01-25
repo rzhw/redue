@@ -1,5 +1,4 @@
 @import "node_modules/bootstrap/scss/bootstrap";
-@import "item";
 
 .navbar {
   @extend .navbar-fixed-top;
@@ -12,5 +11,13 @@
       @extend .nav-item;
       @extend .nav-link;
     }
+  }
+}
+
+ul.items {
+  @extend .list-group;
+
+  li {
+    @extend .list-group-item;
   }
 }

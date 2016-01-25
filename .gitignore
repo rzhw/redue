@@ -9,3 +9,4 @@ node_modules
 npm-debug.log
 debug.log
 app/*.js*
+app/styles.css

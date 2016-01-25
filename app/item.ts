@@ -2,6 +2,7 @@
 
 export interface Item {
   name: string;
+  dateDue: Date;
   status: number|BigInteger;
   data: any;
 }

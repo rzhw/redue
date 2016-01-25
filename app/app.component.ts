@@ -1,6 +1,10 @@
+/// <reference path="../typings/jquery/jquery.d.ts" />
+/// <reference path="../typings/jquery.timeago/jquery.timeago.d.ts" />
 import {Component} from 'angular2/core';
 import {NavbarComponent} from './navbar.component';
 import {Item} from './item';
+
+declare var jQuery: JQueryStatic;
 
 @Component({
   selector: 'dueinator-app',
@@ -9,6 +13,7 @@ import {Item} from './item';
   <ul class="items">
     <li *ngFor="#item of items">
       {{item.name}}
+      (<time class="timeago" [attr.datetime]="item.dateDue | date:'medium'">{{item.dateDue}}</time>)
     </li>
   </ul>`
 })
@@ -51,10 +56,19 @@ export class AppComponent {
       }
       console.log(dueReminders);
 
+      // TODO move this elsewhere.
+      var nsTimeToDate = function(time: number) {
+        var d = new Date(time * 1000 + Date.UTC(2001, 1, 1));
+        // For some reason the above date is off by a month? TODO investigate
+        d.setMonth(d.getMonth() - 1);
+        return d;
+      };
+
       // Now go through this subset. We can combine this code w/above FIXME
       return dueReminders.map(function(x) {
         return <Item>{
           name: <string>dueObjects[x["name"]["UID"]],
+          dateDue: nsTimeToDate(dueObjects[x["dateDue"]["UID"]]["NS.time"]),
           status: <number|BigInteger>x["status"],
           data: x
         };
@@ -64,5 +78,10 @@ export class AppComponent {
     console.log(dueTuples);
 
     this.items = dueTuples;
+  }
+
+  ngAfterViewInit() {
+    // TODO does this result in constantly running timeago
+    jQuery("time.timeago").timeago();
   }
 }

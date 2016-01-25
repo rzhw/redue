@@ -25,7 +25,8 @@
     "zone.js": "0.5.10",
     "jquery": "~2.2.0",
     "tether": "~1.1.1",
-    "bootstrap": "4.0.0-alpha.2"
+    "bootstrap": "4.0.0-alpha.2",
+    "timeago": "~1.5.0"
   },
   "devDependencies": {
     "concurrently": "^1.0.0",

@@ -14,7 +14,7 @@ export class AppComponent {
 
   constructor() {
     // TODO move all this code elsewhere
-    var dueItems = (function() {
+    var dueTuples = (function() {
       var fs = require('fs');
       var path = require('path');
       var os = require('os');
@@ -42,19 +42,19 @@ export class AppComponent {
 
       // Now look for items. We do this by looking for the status field.
       // (Method from https://gist.github.com/maxjacobson/1b72ae7fe658ca8bd60b)
-      var dueItems = [];
+      var dueNodes: Node[] = [];
       var it = dueDoc.evaluate("//key[text()='status']", dueDoc, null, XPathResult.UNORDERED_NODE_ITERATOR_TYPE, null);
       try {
         var thisNode = it.iterateNext();
         while (thisNode) {
-          dueItems.push(thisNode);
+          dueNodes.push(thisNode);
           thisNode = it.iterateNext();
         }
       } catch (e) {
         console.log('OH NO');
         throw e;
       }
-      dueItems = dueItems.map(function(x) {
+      var dueTuples: Node[][] = dueNodes.map(function(x) {
         var parent = x.parentNode;
         var sibling1 = parent.nextSibling;
         while (sibling1.nodeName == "#text") {
@@ -76,13 +76,13 @@ export class AppComponent {
         return tuple;
       });
 
-      return dueItems;
+      return dueTuples;
     })();
 
-    console.log(dueItems);
+    console.log(dueTuples);
 
-    this.items = dueItems.map(function(x) {
-      return { name: x[1].textContent, tuple: x };
+    this.items = dueTuples.map(function(x) {
+      return { name: x[1].textContent, data: x };
     });
   }
 }

@@ -57,26 +57,41 @@ export class AppComponent {
         console.log('OH NO');
         throw e;
       }
-      var dueTuples: Node[][] = dueNodes.map(function(x) {
+      var dueTuples: Item[] = dueNodes.map(function(x) {
+        var dueItem: Item = { name: '', status: -1, data: null };
         var parent = x.parentNode;
-        var sibling1 = parent.nextSibling;
-        while (sibling1.nodeName == "#text") {
-          sibling1 = sibling1.nextSibling;
+
+        // Get the status. It can be an integer or some NSKeyedArchiver data.
+        var statusValueNode = x.nextSibling;
+        while (statusValueNode.nodeName == "#text") {
+          statusValueNode = statusValueNode.nextSibling;
         }
-        var sibling2 = sibling1.nextSibling;
-        while (sibling2.nodeName == "#text") {
-          sibling2 = sibling2.nextSibling;
+        if (statusValueNode.nodeName == "integer") {
+          dueItem.status = parseInt(statusValueNode.textContent);
+        } else if (statusValueNode.nodeName == "dict") {
+          dueItem.status = (<HTMLElement>statusValueNode).innerHTML;
         }
-        var tuple = [parent, sibling1, sibling2];
-        // This will break if there's more than two <string> siblings FIXME
-        if (sibling2.nodeName == "string") {
-          var sibling3 = sibling2.nextSibling;
-          while (sibling3.nodeName == "#text") {
-            sibling3 = sibling3.nextSibling;
-          }
-          tuple.push(sibling3);
+
+        // Get the name. It is the next sibling of the status parent node.
+        // Most items should have a name, but there sometimes can be nameless
+        // items for some reason.
+        var parentNextSibling = parent.nextSibling;
+        while (parentNextSibling.nodeName == "#text") {
+          parentNextSibling = parentNextSibling.nextSibling;
         }
-        return tuple;
+        if (parentNextSibling.nodeName == "string") {
+          dueItem.name = parentNextSibling.textContent;
+        } else {
+          dueItem.name = '???';
+        }
+
+        // Get other info...
+        var parentNextDict = parentNextSibling.nextSibling;
+        while (parentNextDict.nodeName != "dict") {
+          parentNextDict = parentNextDict.nextSibling;
+          dueItem.data = [parent, parentNextDict];
+        }
+        return dueItem;
       });
 
       return dueTuples;
@@ -84,8 +99,6 @@ export class AppComponent {
 
     console.log(dueTuples);
 
-    this.items = dueTuples.map(function(x) {
-      return { name: x[1].textContent, data: x };
-    });
+    this.items = dueTuples;
   }
 }

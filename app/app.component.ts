@@ -37,64 +37,28 @@ export class AppComponent {
       var dueGzBuf = fs.readFileSync(duePath);
       var dueBplistBuf = zlib.unzipSync(dueGzBuf);
       var dueBplistObj = bplist.parseBuffer(dueBplistBuf);
-      var dueObj = dueBplistObj[0];
+      var duePlistDict = dueBplistObj[0];
+      var dueObjects = duePlistDict["$objects"];
+      console.log(dueObjects);
 
-      // Convert it to XML so we can use XPath search on it. Takes time.
-      var dueXml = plist.stringify(dueObj);
-      var dueDoc = new DOMParser().parseFromString(dueXml, 'text/xml');
-
-      // Now look for items. We do this by looking for the status field.
-      // (Method from https://gist.github.com/maxjacobson/1b72ae7fe658ca8bd60b)
-      var dueNodes: Node[] = [];
-      var it = dueDoc.evaluate("//key[text()='status']", dueDoc, null, XPathResult.UNORDERED_NODE_ITERATOR_TYPE, null);
-      try {
-        var thisNode = it.iterateNext();
-        while (thisNode) {
-          dueNodes.push(thisNode);
-          thisNode = it.iterateNext();
+      // Find Due Reminder objects.
+      var dueReminders = [];
+      for (var i = 0; i < dueObjects.length; i++) {
+        if (dueObjects[i].hasOwnProperty("$class")
+            && dueObjects[i]["$class"]["UID"] == 16) { // magic number FIXME
+          dueReminders.push(dueObjects[i]);
         }
-      } catch (e) {
-        console.log('OH NO');
-        throw e;
       }
-      var dueTuples: Item[] = dueNodes.map(function(x) {
-        var dueItem: Item = { name: '', status: -1, data: null };
-        var parent = x.parentNode;
+      console.log(dueReminders);
 
-        // Get the status. It can be an integer or some NSKeyedArchiver data.
-        var statusValueNode = x.nextSibling;
-        while (statusValueNode.nodeName == "#text") {
-          statusValueNode = statusValueNode.nextSibling;
-        }
-        if (statusValueNode.nodeName == "integer") {
-          dueItem.status = parseInt(statusValueNode.textContent);
-        } else if (statusValueNode.nodeName == "dict") {
-          dueItem.status = (<HTMLElement>statusValueNode).innerHTML;
-        }
-
-        // Get the name. It is the next sibling of the status parent node.
-        // Most items should have a name, but there sometimes can be nameless
-        // items for some reason.
-        var parentNextSibling = parent.nextSibling;
-        while (parentNextSibling.nodeName == "#text") {
-          parentNextSibling = parentNextSibling.nextSibling;
-        }
-        if (parentNextSibling.nodeName == "string") {
-          dueItem.name = parentNextSibling.textContent;
-        } else {
-          dueItem.name = '???';
-        }
-
-        // Get other info...
-        var parentNextDict = parentNextSibling.nextSibling;
-        while (parentNextDict.nodeName != "dict") {
-          parentNextDict = parentNextDict.nextSibling;
-          dueItem.data = [parent, parentNextDict];
-        }
-        return dueItem;
-      });
-
-      return dueTuples;
+      // Now go through this subset. We can combine this code w/above FIXME
+      return dueReminders.map(function(x) {
+        return <Item>{
+          name: <string>dueObjects[x["name"]["UID"]],
+          status: <number|BigInteger>x["status"],
+          data: x
+        };
+      })
     })();
 
     console.log(dueTuples);

@@ -1,2 +1,16 @@
 @import "node_modules/bootstrap/scss/bootstrap";
 @import "item";
+
+.navbar {
+  @extend .navbar-fixed-top;
+  @extend .navbar-dark;
+  @extend .bg-inverse;
+
+  .nav {
+    @extend .navbar-nav;
+    a {
+      @extend .nav-item;
+      @extend .nav-link;
+    }
+  }
+}

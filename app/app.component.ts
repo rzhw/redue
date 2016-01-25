@@ -1,9 +1,12 @@
 import {Component} from 'angular2/core';
+import {NavbarComponent} from './navbar.component';
 import {Item} from './item';
 
 @Component({
   selector: 'dueinator-app',
-  template: `<ul class="items">
+  directives: [NavbarComponent],
+  template: `<navbar></navbar>
+  <ul class="items">
     <li *ngFor="#item of items">
       {{item.name}}
     </li>

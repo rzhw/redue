@@ -2,6 +2,7 @@
 /// <reference path="../typings/jquery.timeago/jquery.timeago.d.ts" />
 import {Component} from 'angular2/core';
 import {NavbarComponent} from './navbar.component';
+import {NavbarTab} from './navbartab';
 import {Item} from './item';
 
 declare var jQuery: JQueryStatic;
@@ -9,7 +10,8 @@ declare var jQuery: JQueryStatic;
 @Component({
   selector: 'dueinator-app',
   directives: [NavbarComponent],
-  template: `<navbar></navbar>
+  template: `<navbar [selectedTab]="selectedTab"
+    (selectedTabChanged)="onSelectedTabChanged($event)"></navbar>
   <ul class="items">
     <li *ngFor="#item of items">
       {{item.name}}
@@ -19,6 +21,8 @@ declare var jQuery: JQueryStatic;
 })
 export class AppComponent {
   public items: Item[];
+  public selectedTab: NavbarTab;
+  private allItems: Item[];
 
   constructor() {
     // TODO move all this code elsewhere
@@ -77,11 +81,18 @@ export class AppComponent {
 
     console.log(dueTuples);
 
-    this.items = dueTuples;
+    this.allItems = dueTuples;
+    this.items = this.allItems;
   }
 
   ngAfterViewInit() {
     // TODO does this result in constantly running timeago
     jQuery("time.timeago").timeago();
+  }
+
+  onSelectedTabChanged(tab: NavbarTab) {
+    this.items = this.allItems.filter(reminder => {
+      return tab.filter(reminder.status);
+    });
   }
 }

@@ -14,19 +14,19 @@
   "license": "MIT",
   "homepage": "https://github.com/rzhw/Dueinator",
   "dependencies": {
-    "bplist-parser": "~0.1.1",
-    "simple-plist": "~0.0.4",
     "angular2": "2.0.0-beta.0",
-    "systemjs": "0.19.6",
+    "angular2-moment": "^0.2.1",
+    "bootstrap": "4.0.0-alpha.2",
+    "bplist-parser": "~0.1.1",
     "es6-promise": "^3.0.2",
     "es6-shim": "^0.33.3",
+    "jquery": "~2.2.0",
     "reflect-metadata": "0.1.2",
     "rxjs": "5.0.0-beta.0",
-    "zone.js": "0.5.10",
-    "jquery": "~2.2.0",
+    "simple-plist": "~0.0.4",
+    "systemjs": "0.19.6",
     "tether": "~1.1.1",
-    "bootstrap": "4.0.0-alpha.2",
-    "timeago": "~1.5.0"
+    "zone.js": "0.5.10"
   },
   "devDependencies": {
     "concurrently": "^1.0.0",

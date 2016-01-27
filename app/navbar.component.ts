@@ -25,7 +25,9 @@ export class NavbarComponent {
     { name: "Logged", filter: (s: number) => { return s > 2 } }
   ]
 
-  constructor() {
+  constructor() { }
+
+  ngOnInit() {
     this.onSelect(this.tabs[0]);
   }
 

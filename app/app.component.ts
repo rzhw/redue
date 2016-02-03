@@ -89,6 +89,13 @@ export class AppComponent {
   onSelectedTabChanged(tab: NavbarTab) {
     this.items = this.allItems.filter(reminder => {
       return tab.filter(reminder.status);
+    }).sort((a, b) => {
+      if (a.dateDue < b.dateDue) {
+        return -1;
+      } else if (a.dateDue > b.dateDue) {
+        return 1;
+      }
+      return 0;
     });
   }
 }

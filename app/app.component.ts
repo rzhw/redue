@@ -47,15 +47,15 @@ export class AppComponent {
 
   onSelectedTabChanged(tab: NavbarTab) {
     // TODO this should be in RemindersManager
-    this.reminders = this.remindersManager.allReminders.filter(reminder => {
-      return tab.filter(reminder.status);
-    }).sort((a, b) => {
-      if (a.dateDue < b.dateDue) {
-        return -1;
-      } else if (a.dateDue > b.dateDue) {
-        return 1;
-      }
-      return 0;
-    });
+    this.reminders =
+        this.remindersManager.allReminders.filter(reminder => tab.filter(reminder.status))
+            .sort((a, b) => {
+              if (a.dateDue < b.dateDue) {
+                return -1;
+              } else if (a.dateDue > b.dateDue) {
+                return 1;
+              }
+              return 0;
+            });
   }
 }

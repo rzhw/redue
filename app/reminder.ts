@@ -3,6 +3,6 @@
 export interface Reminder {
   name: string;
   dateDue: Date;
-  status: number|BigInteger;
+  status: number | BigInteger;
   data: any;
 }

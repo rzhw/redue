@@ -41,8 +41,8 @@ export class RemindersManager {
     // Find Due Reminder objects.
     var dueReminders = [];
     for (var i = 0; i < dueObjects.length; i++) {
-      if (dueObjects[i].hasOwnProperty("$class")
-          && dueObjects[i]["$class"]["UID"] == 16) { // magic number FIXME
+      if (dueObjects[i].hasOwnProperty("$class") &&
+          dueObjects[i]["$class"]["UID"] == 16) {  // magic number FIXME
         dueReminders.push(dueObjects[i]);
       }
     }
@@ -61,9 +61,10 @@ export class RemindersManager {
     // Now go through this subset. We can combine this code w/above FIXME
     var reminders = dueReminders.map(function(x) {
       return <Reminder>{
-        name: <string>dueObjects[x["name"]["UID"]],
+        name: <string>
+            dueObjects[x["name"]["UID"]],
         dateDue: nsTimeToDate(dueObjects[x["dateDue"]["UID"]]["NS.time"]),
-        status: <number|BigInteger>x["status"],
+        status: <number | BigInteger>x["status"],
         data: x
       };
     });
@@ -83,23 +84,23 @@ export class RemindersManager {
     this.overdueTimers.forEach(x => clearInterval(x));
 
     // Go through all active reminders
-    this.allReminders.filter(x => x.status == RemindersManager.UPCOMING_STATUS
-        || x.status == RemindersManager.OVERDUE_STATUS).forEach(reminder => {
-      // Get the timeout.
-      var timeout = reminder.dateDue.getTime() - (new Date()).getTime();
+    this.allReminders
+        .filter(
+            x => x.status == RemindersManager.UPCOMING_STATUS ||
+                x.status == RemindersManager.OVERDUE_STATUS)
+        .forEach(reminder => {
+          // Get the timeout.
+          var timeout = reminder.dateDue.getTime() - (new Date()).getTime();
 
-      // TODO: should there be some sort of leeway to still trigger anyway?
-      if (timeout >= 0) {
-        this.timers.push(setTimeout(() => {
-          notifier.notify({
-            title: 'Due',
-            message: reminder.name
-          });
-        }, timeout));
-      } else {
-        // TODO
-      }
-    });
+          // TODO: should there be some sort of leeway to still trigger anyway?
+          if (timeout >= 0) {
+            this.timers.push(setTimeout(() => {
+              notifier.notify({title: 'Due', message: reminder.name});
+            }, timeout));
+          } else {
+            // TODO
+          }
+        });
     console.log(this.timers);
   }
 }

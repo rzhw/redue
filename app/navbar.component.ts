@@ -20,16 +20,14 @@ export class NavbarComponent {
   public selectedTab: NavbarTab;
   public selectedTabChanged = new EventEmitter<NavbarTab>();
   private tabs: NavbarTab[] = [
-    { name: "Reminders", filter: (s: number) => { return s == 1 || s == 2 } },
-    { name: "Timers", filter: (s: number) => { return s == 0 } },
-    { name: "Logged", filter: (s: number) => { return s > 2 } }
-  ]
+    {name: "Reminders", filter: (s: number) => { return s == 1 || s == 2 }},
+    {name: "Timers", filter: (s: number) => { return s == 0 }},
+    {name: "Logged", filter: (s: number) => { return s > 2 }}
+  ];
 
-  constructor() { }
+  constructor() {}
 
-  ngOnInit() {
-    this.onSelect(this.tabs[0]);
-  }
+  ngOnInit() { this.onSelect(this.tabs[0]); }
 
   onSelect(tab: NavbarTab) {
     this.selectedTab = tab;

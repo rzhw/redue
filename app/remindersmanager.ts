@@ -1,3 +1,4 @@
+import {Observable, Subject} from 'rxjs/Rx';
 import {Reminder} from './reminder';
 import {RemindersParser} from './remindersparser';
 
@@ -9,9 +10,9 @@ var chokidar = require('chokidar');
 
 export class RemindersManager {
   public allReminders: Reminder[];
+  public remindersChanged: Subject<Reminder[]> = new Subject<Reminder[]>();
   private timers: NodeJS.Timer[];
   private overdueTimers: NodeJS.Timer[];
-  private remindersChangedCallbacks: ((reminders: Reminder[]) => void)[];
   private fileWatcher;
 
   // A fun tidbit of note: an overdue status may indeed be of status 2, but
@@ -26,13 +27,8 @@ export class RemindersManager {
     this.allReminders = reminders;
     this.timers = [];
     this.overdueTimers = [];
-    this.remindersChangedCallbacks = [];
 
     this.updateTimers();
-  }
-
-  onRemindersChanged(callback: (reminders: Reminder[]) => void) {
-    this.remindersChangedCallbacks.push(callback);
   }
 
   static fromPath(pathStr: string) {
@@ -48,7 +44,7 @@ export class RemindersManager {
   private updateReminders(reminders: Reminder[]) {
     this.allReminders = reminders;
     this.updateTimers();
-    this.remindersChangedCallbacks.forEach(x => x(this.allReminders));
+    this.remindersChanged.next(this.allReminders);
   }
 
   // FIXME this is really inefficient if there's lots of reminders

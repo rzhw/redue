@@ -26,7 +26,8 @@
     "simple-plist": "~0.0.4",
     "systemjs": "0.19.6",
     "tether": "~1.1.1",
-    "zone.js": "0.5.10"
+    "zone.js": "0.5.10",
+    "node-notifier": "^4.4.0"
   },
   "devDependencies": {
     "concurrently": "^1.0.0",

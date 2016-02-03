@@ -6,6 +6,7 @@ var os = require('os');
 var zlib = require('zlib');
 var bplist = require('bplist-parser');
 var plist = require('simple-plist');
+var notifier = require('node-notifier');
 
 export class RemindersManager {
   public allReminders: Reminder[];
@@ -90,7 +91,10 @@ export class RemindersManager {
         // TODO clean me up
         var timeout = reminder.dateDue.getTime() - (new Date()).getTime();
         this.timers.push(setTimeout(() => {
-          alert('Reminder triggered: ' + reminder.name);
+          notifier.notify({
+            title: 'Due',
+            message: reminder.name
+          });
         }, timeout));
       }
       // TODO overdue statuses

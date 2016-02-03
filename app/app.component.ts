@@ -64,8 +64,10 @@ export class AppComponent {
       // TODO move this elsewhere.
       var nsTimeToDate = function(time: number) {
         var d = new Date(time * 1000 + Date.UTC(2001, 1, 1));
-        // For some reason the above date is off by a month? TODO investigate
+        // For some reason the above date is off by a month and two days?
+        // TODO investigate
         d.setMonth(d.getMonth() - 1);
+        d.setDate(d.getDate() - 2);
         return d;
       };
 

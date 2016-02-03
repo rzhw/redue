@@ -83,7 +83,7 @@ export class AppComponent {
     console.log(dueTuples);
 
     this.allItems = dueTuples;
-    this.items = this.allItems;
+    this.items = [];
   }
 
   onSelectedTabChanged(tab: NavbarTab) {

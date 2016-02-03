@@ -7,12 +7,15 @@ var zlib = require('zlib');
 var bplist = require('bplist-parser');
 var plist = require('simple-plist');
 var notifier = require('node-notifier');
+var chokidar = require('chokidar');
 
 export class RemindersManager {
   public allReminders: Reminder[];
   public currentReminders: Reminder[];
-  public timers: NodeJS.Timer[];
-  public overdueTimers: NodeJS.Timer[];
+  private timers: NodeJS.Timer[];
+  private overdueTimers: NodeJS.Timer[];
+  private remindersChangedCallbacks: ((reminders: Reminder[]) => void)[];
+  private fileWatcher;
 
   // A fun tidbit of note: an overdue status may indeed be of status 2, but
   // take an upcoming reminder which passed. Its status is of course still 1!
@@ -20,17 +23,41 @@ export class RemindersManager {
   public static get UPCOMING_STATUS(): number { return 1 }
   public static get TIMER_STATUS(): number { return 0 }
 
-  constructor(reminders: Reminder[]) {
+  constructor(reminders?: Reminder[]) {
+    reminders = reminders || [];
+
     this.allReminders = reminders;
     this.currentReminders = [];
     this.timers = [];
     this.overdueTimers = [];
+    this.remindersChangedCallbacks = [];
 
     this.updateTimers();
   }
 
-  // TODO consider moving this into a RemindersParser or similarly named class
+  onRemindersChanged(callback: (reminders: Reminder[]) => void) {
+    this.remindersChangedCallbacks.push(callback);
+  }
+
   static fromPath(pathStr: string) {
+    var remindersManager = new RemindersManager();
+    remindersManager.fileWatcher = chokidar.watch(pathStr).on('all', (event, path) => {
+      console.log('File changed!');
+      var reminders = RemindersManager.pathToReminders(pathStr);
+      remindersManager.updateReminders(reminders);
+    });
+    return remindersManager;
+  }
+
+  private updateReminders(reminders: Reminder[]) {
+    this.allReminders = reminders;
+    this.updateTimers();
+    this.remindersChangedCallbacks.forEach(x => x(this.allReminders));
+  }
+
+  // TODO consider moving this into a RemindersParser or similarly named class
+  // TODO like for real
+  private static pathToReminders(pathStr: string) {
     var dueGzBuf = fs.readFileSync(pathStr);
     var dueBplistBuf = zlib.unzipSync(dueGzBuf);
     var dueBplistObj = bplist.parseBuffer(dueBplistBuf);
@@ -70,7 +97,7 @@ export class RemindersManager {
       };
     });
 
-    return new RemindersManager(reminders);
+    return reminders;
   }
 
   // FIXME this is really inefficient if there's lots of reminders

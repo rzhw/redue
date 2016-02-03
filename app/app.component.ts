@@ -17,7 +17,7 @@ var os = require('os');
   directives: [NavbarComponent],
   pipes: [TimeAgoPipe],
   template: `<navbar [selectedTab]="selectedTab"
-    (selectedTabChanged)="onSelectedTabChanged($event)"></navbar>
+    (selectedTabChanged)="selectedTabChanged($event)"></navbar>
   <ul class="reminders">
     <li *ngFor="#reminder of reminders">
       {{reminder.name}}
@@ -43,10 +43,18 @@ export class AppComponent {
     this.remindersManager = RemindersManager.fromPath(duePath);
     console.log('RemindersManager initialised');
     console.log(this.remindersManager.allReminders);
+
+    // Set up the reminders changed event
+    this.remindersManager.onRemindersChanged(this.remindersChanged);
   }
 
-  onSelectedTabChanged(tab: NavbarTab) {
-    // TODO this should be in RemindersManager
+  remindersChanged(reminders: Reminder[]) {
+    console.log('remindersChanged called TODO do something');
+  }
+
+  selectedTabChanged(tab: NavbarTab) {
+    this.selectedTab = tab;
+    // TODO this probably should be in RemindersManager
     this.reminders =
         this.remindersManager.allReminders.filter(reminder => tab.filter(reminder.status))
             .sort((a, b) => {

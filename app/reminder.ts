@@ -5,4 +5,5 @@ export interface Reminder {
   dateDue: Date;
   status: number | BigInteger;
   data: any;
+  snoozeIntervalMs: number;
 }

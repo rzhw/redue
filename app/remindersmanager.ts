@@ -65,7 +65,8 @@ export class RemindersManager {
             dueObjects[x["name"]["UID"]],
         dateDue: nsTimeToDate(dueObjects[x["dateDue"]["UID"]]["NS.time"]),
         status: <number | BigInteger>x["status"],
-        data: x
+        data: x,
+        snoozeIntervalMs: <number>x["snoozeInterval"] * 1000
       };
     });
 
@@ -91,15 +92,22 @@ export class RemindersManager {
         .forEach(reminder => {
           // Get the timeout.
           var timeout = reminder.dateDue.getTime() - (new Date()).getTime();
+          var snoozed = timeout < 0;
 
-          // TODO: should there be some sort of leeway to still trigger anyway?
-          if (timeout >= 0) {
-            this.timers.push(setTimeout(() => {
-              notifier.notify({title: 'Due', message: reminder.name});
-            }, timeout));
-          } else {
-            // TODO
+          // If this reminder is snoozed, find the next instance and use that
+          // as the next timeout.
+          if (snoozed) {
+            var mult = -Math.ceil(timeout / reminder.snoozeIntervalMs) + 1;
+            timeout += mult * reminder.snoozeIntervalMs;
           }
+
+          this.timers.push(setTimeout(() => {
+            notifier.notify({
+              title: 'Due',
+              message: reminder.name + (snoozed ? ' (snoozed)' : '')
+            });
+            // TODO setInterval for snoozing
+          }, timeout));
         });
     console.log(this.timers);
   }

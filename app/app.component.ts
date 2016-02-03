@@ -3,7 +3,7 @@ import {Component} from 'angular2/core';
 import {TimeAgoPipe} from 'angular2-moment';
 import {NavbarComponent} from './navbar.component';
 import {NavbarTab} from './navbartab';
-import {Item} from './item';
+import {Reminder} from './reminder';
 
 declare var jQuery: JQueryStatic;
 
@@ -13,17 +13,17 @@ declare var jQuery: JQueryStatic;
   pipes: [TimeAgoPipe],
   template: `<navbar [selectedTab]="selectedTab"
     (selectedTabChanged)="onSelectedTabChanged($event)"></navbar>
-  <ul class="items">
-    <li *ngFor="#item of items">
-      {{item.name}}
-      (<time>{{item.dateDue | amTimeAgo }}</time>)
+  <ul class="reminders">
+    <li *ngFor="#reminder of reminders">
+      {{reminder.name}}
+      (<time>{{reminder.dateDue | amTimeAgo }}</time>)
     </li>
   </ul>`
 })
 export class AppComponent {
-  public items: Item[];
+  public reminders: Reminder[];
   public selectedTab: NavbarTab;
-  private allItems: Item[];
+  private allReminders: Reminder[];
 
   constructor() {
     // TODO move all this code elsewhere
@@ -73,7 +73,7 @@ export class AppComponent {
 
       // Now go through this subset. We can combine this code w/above FIXME
       return dueReminders.map(function(x) {
-        return <Item>{
+        return <Reminder>{
           name: <string>dueObjects[x["name"]["UID"]],
           dateDue: nsTimeToDate(dueObjects[x["dateDue"]["UID"]]["NS.time"]),
           status: <number|BigInteger>x["status"],
@@ -84,12 +84,12 @@ export class AppComponent {
 
     console.log(dueTuples);
 
-    this.allItems = dueTuples;
-    this.items = [];
+    this.allReminders = dueTuples;
+    this.reminders = [];
   }
 
   onSelectedTabChanged(tab: NavbarTab) {
-    this.items = this.allItems.filter(reminder => {
+    this.reminders = this.allReminders.filter(reminder => {
       return tab.filter(reminder.status);
     }).sort((a, b) => {
       if (a.dateDue < b.dateDue) {

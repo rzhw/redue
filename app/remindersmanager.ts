@@ -10,10 +10,20 @@ var plist = require('simple-plist');
 export class RemindersManager {
   public allReminders: Reminder[];
   public currentReminders: Reminder[];
+  public timers: NodeJS.Timer[];
+  public overdueTimers: NodeJS.Timer[];
+
+  public static get OVERDUE_STATUS(): number { return 2 }
+  public static get UPCOMING_STATUS(): number { return 1 }
+  public static get TIMER_STATUS(): number { return 0 }
 
   constructor(reminders: Reminder[]) {
     this.allReminders = reminders;
     this.currentReminders = [];
+    this.timers = [];
+    this.overdueTimers = [];
+
+    this.updateTimers();
   }
 
   // TODO consider moving this into a RemindersParser or similarly named class
@@ -56,5 +66,35 @@ export class RemindersManager {
     });
 
     return new RemindersManager(reminders);
+  }
+
+  // FIXME this is really inefficient if there's lots of reminders
+  // (Though fixing this requires a rethink of how reminders are loaded
+  // and particularly, updated on sync)
+  // TODO curious about a race condition; what would happen if the clear
+  // happens, but a reminder is in the process of being triggered and creating
+  // an interval? is that even possible?
+  private updateTimers() {
+    // Stop all existing timers
+    for (var i = 0; i < this.timers.length; i++) {
+      clearTimeout(this.timers[i]);
+    }
+    for (var i = 0; i < this.overdueTimers.length; i++) {
+      clearInterval(this.overdueTimers[i]);
+    }
+
+    // Go through all the reminders
+    for (var i = 0; i < this.allReminders.length; i++) {
+      var reminder = this.allReminders[i];
+      if (reminder.status == RemindersManager.UPCOMING_STATUS) {
+        // TODO clean me up
+        var timeout = reminder.dateDue.getTime() - (new Date()).getTime();
+        this.timers.push(setTimeout(() => {
+          alert('Reminder triggered: ' + reminder.name);
+        }, timeout));
+      }
+      // TODO overdue statuses
+    }
+    console.log(this.timers);
   }
 }

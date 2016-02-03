@@ -30,8 +30,11 @@
     "node-notifier": "^4.4.0"
   },
   "devDependencies": {
+    "clang-format": "^1.0.32",
     "concurrently": "^1.0.0",
     "electron-prebuilt": "^0.36.0",
+    "gulp": "^3.8.8",
+    "gulp-clang-format": "^1.0.23",
     "typescript": "^1.7.3",
     "node-sass": "^3.4.2"
   }

@@ -1,17 +1,14 @@
 import {Reminder} from './reminder';
+import {RemindersParser} from './remindersparser';
 
 var fs = require('fs');
 var path = require('path');
 var os = require('os');
-var zlib = require('zlib');
-var bplist = require('bplist-parser');
-var plist = require('simple-plist');
 var notifier = require('node-notifier');
 var chokidar = require('chokidar');
 
 export class RemindersManager {
   public allReminders: Reminder[];
-  public currentReminders: Reminder[];
   private timers: NodeJS.Timer[];
   private overdueTimers: NodeJS.Timer[];
   private remindersChangedCallbacks: ((reminders: Reminder[]) => void)[];
@@ -27,7 +24,6 @@ export class RemindersManager {
     reminders = reminders || [];
 
     this.allReminders = reminders;
-    this.currentReminders = [];
     this.timers = [];
     this.overdueTimers = [];
     this.remindersChangedCallbacks = [];
@@ -43,7 +39,7 @@ export class RemindersManager {
     var remindersManager = new RemindersManager();
     remindersManager.fileWatcher = chokidar.watch(pathStr).on('all', (event, path) => {
       console.log('File changed!');
-      var reminders = RemindersManager.pathToReminders(pathStr);
+      var reminders = new RemindersParser().pathToReminders(pathStr);
       remindersManager.updateReminders(reminders);
     });
     return remindersManager;
@@ -53,51 +49,6 @@ export class RemindersManager {
     this.allReminders = reminders;
     this.updateTimers();
     this.remindersChangedCallbacks.forEach(x => x(this.allReminders));
-  }
-
-  // TODO consider moving this into a RemindersParser or similarly named class
-  // TODO like for real
-  private static pathToReminders(pathStr: string) {
-    var dueGzBuf = fs.readFileSync(pathStr);
-    var dueBplistBuf = zlib.unzipSync(dueGzBuf);
-    var dueBplistObj = bplist.parseBuffer(dueBplistBuf);
-    var duePlistDict = dueBplistObj[0];
-    var dueObjects = duePlistDict["$objects"];
-    console.log(dueObjects);
-
-    // Find Due Reminder objects.
-    var dueReminders = [];
-    for (var i = 0; i < dueObjects.length; i++) {
-      if (dueObjects[i].hasOwnProperty("$class") &&
-          dueObjects[i]["$class"]["UID"] == 16) {  // magic number FIXME
-        dueReminders.push(dueObjects[i]);
-      }
-    }
-    console.log(dueReminders);
-
-    // TODO move this elsewhere.
-    var nsTimeToDate = function(time: number) {
-      var d = new Date(time * 1000 + Date.UTC(2001, 1, 1));
-      // For some reason the above date is off by a month and two days?
-      // TODO investigate
-      d.setMonth(d.getMonth() - 1);
-      d.setDate(d.getDate() - 2);
-      return d;
-    };
-
-    // Now go through this subset. We can combine this code w/above FIXME
-    var reminders = dueReminders.map(function(x) {
-      return <Reminder>{
-        name: <string>
-            dueObjects[x["name"]["UID"]],
-        dateDue: nsTimeToDate(dueObjects[x["dateDue"]["UID"]]["NS.time"]),
-        status: <number | BigInteger>x["status"],
-        data: x,
-        snoozeIntervalMs: <number>x["snoozeInterval"] * 1000
-      };
-    });
-
-    return reminders;
   }
 
   // FIXME this is really inefficient if there's lots of reminders

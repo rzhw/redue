@@ -42,28 +42,37 @@ export class AppComponent {
     var duePath = path.join(dbPath, 'Apps/Due App/Sync.dueappgz');
     this.remindersManager = RemindersManager.fromPath(duePath);
     console.log('RemindersManager initialised');
-    console.log(this.remindersManager.allReminders);
 
     // Set up the reminders changed event
-    this.remindersManager.onRemindersChanged(this.remindersChanged);
+    this.remindersManager.onRemindersChanged(x => this.remindersChanged(x));
   }
 
   remindersChanged(reminders: Reminder[]) {
-    console.log('remindersChanged called TODO do something');
+    console.log('remindersChanged called');
+    this.refreshReminders();
   }
 
   selectedTabChanged(tab: NavbarTab) {
+    console.log('selectedTabChanged called');
     this.selectedTab = tab;
-    // TODO this probably should be in RemindersManager
-    this.reminders =
-        this.remindersManager.allReminders.filter(reminder => tab.filter(reminder.status))
-            .sort((a, b) => {
-              if (a.dateDue < b.dateDue) {
-                return -1;
-              } else if (a.dateDue > b.dateDue) {
-                return 1;
-              }
-              return 0;
-            });
+    this.refreshReminders();
+  }
+
+  private refreshReminders() {
+    console.log('refreshReminders called');
+    console.log(this.remindersManager.allReminders);
+    if (this.selectedTab === undefined) {
+      return;
+    }
+    this.reminders = this.remindersManager.allReminders
+                         .filter(reminder => this.selectedTab.filter(reminder.status))
+                         .sort((a, b) => {
+                           if (a.dateDue < b.dateDue) {
+                             return -1;
+                           } else if (a.dateDue > b.dateDue) {
+                             return 1;
+                           }
+                           return 0;
+                         });
   }
 }

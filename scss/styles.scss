@@ -1,5 +1,10 @@
 @import "node_modules/bootstrap/scss/bootstrap";
 
+body {
+  // Make up for fixed navbar
+  padding-top: 53px;
+}
+
 .navbar {
   @extend .navbar-fixed-top;
   @extend .navbar-dark;

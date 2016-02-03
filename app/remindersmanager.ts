@@ -83,6 +83,8 @@ export class RemindersManager {
     // Stop all existing timers
     this.timers.forEach(x => clearTimeout(x));
     this.overdueTimers.forEach(x => clearInterval(x));
+    this.timers = [];
+    this.overdueTimers = [];
 
     // Go through all active reminders
     this.allReminders
@@ -101,12 +103,17 @@ export class RemindersManager {
             timeout += mult * reminder.snoozeIntervalMs;
           }
 
+          var notifyObject = {
+            title: 'Reminder' + (snoozed ? ' (snoozed)' : ''),
+            message: reminder.name
+          };
+
+          // Set up the timer for the first notification.
           this.timers.push(setTimeout(() => {
-            notifier.notify({
-              title: 'Due',
-              message: reminder.name + (snoozed ? ' (snoozed)' : '')
-            });
-            // TODO setInterval for snoozing
+            notifier.notify(notifyObject);
+            // Set up the interval for following notifications.
+            this.overdueTimers.push(
+                setInterval(() => { notifier.notify(notifyObject); }, reminder.snoozeIntervalMs));
           }, timeout));
         });
     console.log(this.timers);

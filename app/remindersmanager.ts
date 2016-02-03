@@ -14,6 +14,8 @@ export class RemindersManager {
   public timers: NodeJS.Timer[];
   public overdueTimers: NodeJS.Timer[];
 
+  // A fun tidbit of note: an overdue status may indeed be of status 2, but
+  // take an upcoming reminder which passed. Its status is of course still 1!
   public static get OVERDUE_STATUS(): number { return 2 }
   public static get UPCOMING_STATUS(): number { return 1 }
   public static get TIMER_STATUS(): number { return 0 }
@@ -77,28 +79,27 @@ export class RemindersManager {
   // an interval? is that even possible?
   private updateTimers() {
     // Stop all existing timers
-    for (var i = 0; i < this.timers.length; i++) {
-      clearTimeout(this.timers[i]);
-    }
-    for (var i = 0; i < this.overdueTimers.length; i++) {
-      clearInterval(this.overdueTimers[i]);
-    }
+    this.timers.forEach(x => clearTimeout(x));
+    this.overdueTimers.forEach(x => clearInterval(x));
 
-    // Go through all the reminders
-    for (var i = 0; i < this.allReminders.length; i++) {
-      var reminder = this.allReminders[i];
-      if (reminder.status == RemindersManager.UPCOMING_STATUS) {
-        // TODO clean me up
-        var timeout = reminder.dateDue.getTime() - (new Date()).getTime();
+    // Go through all active reminders
+    this.allReminders.filter(x => x.status == RemindersManager.UPCOMING_STATUS
+        || x.status == RemindersManager.OVERDUE_STATUS).forEach(reminder => {
+      // Get the timeout.
+      var timeout = reminder.dateDue.getTime() - (new Date()).getTime();
+
+      // TODO: should there be some sort of leeway to still trigger anyway?
+      if (timeout >= 0) {
         this.timers.push(setTimeout(() => {
           notifier.notify({
             title: 'Due',
             message: reminder.name
           });
         }, timeout));
+      } else {
+        // TODO
       }
-      // TODO overdue statuses
-    }
+    });
     console.log(this.timers);
   }
 }

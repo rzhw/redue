@@ -5,5 +5,6 @@ export interface Reminder {
   dateDue: Date;
   status: number | BigInteger;
   data: any;
-  snoozeIntervalMs: number;
+  snoozeIntervalMs: number; // TODO change this to seconds
+  countdownS: number;
 }

@@ -44,7 +44,8 @@ export class RemindersParser {
         dateDue: nsTimeToDate(dueObjects[x["dateDue"]["UID"]]["NS.time"]),
         status: <number | BigInteger>x["status"],
         data: x,
-        snoozeIntervalMs: <number>x["snoozeInterval"] * 1000
+        snoozeIntervalMs: <number>x["snoozeInterval"] * 1000,
+        countdownS: <number>x["countdown"]
       };
     });
 

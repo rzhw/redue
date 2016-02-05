@@ -6,6 +6,7 @@ import {NavbarComponent} from './navbar.component';
 import {NavbarTab} from './navbartab';
 import {Reminder} from './reminder';
 import {RemindersManager} from './remindersmanager';
+import {TimerComponent} from './timer.component';
 
 declare var jQuery: JQueryStatic;
 
@@ -15,14 +16,18 @@ var os = require('os');
 
 @Component({
   selector: 'dueinator-app',
-  directives: [NavbarComponent],
+  directives: [NavbarComponent, TimerComponent],
   pipes: [TimeAgoPipe],
   template: `<navbar [selectedTab]="selectedTab"
     (selectedTabChanged)="selectedTabChanged.next($event)"></navbar>
   <ul class="reminders">
     <li *ngFor="#reminder of reminders | async">
-      {{reminder.name}}
-      (<time>{{reminder.dateDue | amTimeAgo }}</time>)
+      <!-- TODO why doesn't RemindersManager.TIMER_STATUS work -->
+      <div [hidden]="reminder.status == 0">
+        {{reminder.name}}
+        (<time>{{reminder.dateDue | amTimeAgo }}</time>)
+      </div>
+      <timer [hidden]="reminder.status != 0" [reminder]="reminder"></timer>
     </li>
   </ul>`
 })

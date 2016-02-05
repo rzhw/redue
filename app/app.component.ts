@@ -18,7 +18,7 @@ var os = require('os');
   directives: [NavbarComponent],
   pipes: [TimeAgoPipe],
   template: `<navbar [selectedTab]="selectedTab"
-    (selectedTabChanged)="selectedTabChanged($event)"></navbar>
+    (selectedTabChanged)="selectedTabChanged.next($event)"></navbar>
   <ul class="reminders">
     <li *ngFor="#reminder of reminders | async">
       {{reminder.name}}
@@ -29,8 +29,7 @@ var os = require('os');
 export class AppComponent {
   public remindersManager: RemindersManager;
   public reminders: Observable<Reminder[]>;
-  public selectedTab: NavbarTab;
-  private selectedTabChangedSubject: Subject<NavbarTab> = new Subject<NavbarTab>();
+  private selectedTabChanged: Subject<NavbarTab> = new Subject<NavbarTab>();
 
   constructor() {
     // Get Dropbox folder path. Currently assumes personal, FIXME
@@ -48,7 +47,7 @@ export class AppComponent {
     // Set up the reminders changed event
     this.reminders =
         Observable
-            .combineLatest(this.remindersManager.remindersChanged, this.selectedTabChangedSubject)
+            .combineLatest(this.remindersManager.remindersChanged, this.selectedTabChanged)
             .map(x => {
               var reminders = x[0];
               var selectedTab = x[1];
@@ -67,10 +66,5 @@ export class AppComponent {
                     return 0;
                   });
             });
-  }
-
-  selectedTabChanged(tab: NavbarTab) {
-    this.selectedTabChangedSubject.next(tab);
-    this.selectedTab = tab;
   }
 }

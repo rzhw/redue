@@ -1,9 +1,5 @@
 @import "node_modules/bootstrap/scss/bootstrap";
 
-* {
-  cursor: default;
-}
-
 body {
   // Make up for fixed navbar
   padding-top: 53px;
@@ -29,4 +25,26 @@ ul.reminders {
   li {
     @extend .list-group-item;
   }
+}
+
+/* Make things feel more desktop-y, courtesy @OlsonDev
+https://github.com/atom/electron/issues/2538#issuecomment-133083181*/
+
+:not(input):not(textarea),
+:not(input):not(textarea)::after,
+:not(input):not(textarea)::before {
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: default;
+}
+input, button, textarea, :focus {
+    outline: none;
+}
+a:not([draggable=true]), img:not([draggable=true]) {
+    -webkit-user-drag: none;
+}
+a[href^="http://"],
+a[href^="https://"],
+a[href^="ftp://"] {
+    -webkit-user-drag: auto;
 }

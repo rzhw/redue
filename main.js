@@ -26,7 +26,8 @@ app.on('ready', function() {
     width: 800,
     height: 600,
     autoHideMenuBar: true,
-    title: 'Redue'
+    title: 'Redue',
+    icon: 'assets/icon.png'
   });
 
   // and load the index.html of the app.

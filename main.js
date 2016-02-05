@@ -25,7 +25,8 @@ app.on('ready', function() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    autoHideMenuBar: true
+    autoHideMenuBar: true,
+    title: 'Redue'
   });
 
   // and load the index.html of the app.

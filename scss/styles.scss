@@ -1,5 +1,9 @@
 @import "node_modules/bootstrap/scss/bootstrap";
 
+* {
+  cursor: default;
+}
+
 body {
   // Make up for fixed navbar
   padding-top: 53px;
